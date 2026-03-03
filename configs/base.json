@@ -1,0 +1,27 @@
+{
+  "data": {
+    "source_dir": "Dataset/source",
+    "target_dir": "Dataset/target",
+    "image_size": 512,
+    "channels": 1,
+    "val_fraction": 0.1,
+    "test_fraction": 0.1
+  },
+  "model": {
+    "name": "autoencoder",
+    "base_filters": 32,
+    "loss": "mixed_l2"
+  },
+  "train": {
+    "epochs": 50,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "seed": 42,
+    "shuffle_buffer": 512
+  },
+  "experiment": {
+    "output_dir": "outputs",
+    "experiment_name": "ae_mixed_l2",
+    "resume_checkpoint": null
+  }
+}
