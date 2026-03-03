@@ -24,3 +24,5 @@ matplotlib==3.3.4
 # Utilities
 tqdm==4.62.3
 h5py==3.1.0
+# Config parsing
+PyYAML==6.0.2
