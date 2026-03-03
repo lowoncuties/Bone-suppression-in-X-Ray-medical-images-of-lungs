@@ -1,115 +1,112 @@
-# Reproducibility Package
-## GAN-based Bone Suppression Using a Combined Loss Function
+# Reproducibility Package — GAN-based Bone Suppression Using a Combined Loss Function
 
-This repository now contains a CLI-first, modular Python implementation for reproducing bone suppression experiments from the original notebooks.
+This repository contains the source code, trained models, and configuration files for:
 
-## Project structure
+Jochymek L., Vašinková M., Doležíl V., Gajdoš P.  
+**GAN-based bone suppression using a combined loss function.** (2026)
 
-- `train.py`: main training entrypoint.
-- `evaluate.py`: standalone evaluation/report entrypoint.
-- `configs/base.yaml`: default experiment configuration.
-- `src/bonesuppression/`
-  - `data/`: paired image loading and dataset splitting.
-  - `models/`: autoencoder and U-Net builders, losses, model factory.
-  - `training/`: training/evaluation utilities and artifact plotting.
-  - `eval/`: final report + methods summary writers.
-  - `utils/`: reproducibility and run directory utilities.
-- `experiments/`: archival copy of original notebooks (`AE_UNET_BS.ipynb`, `GAN_BS.ipynb`).
-- root notebooks are preserved for backward compatibility.
+The goal is to enable full reproducibility of the experiments reported in the paper.
 
-## Dataset
+## What this repository reproduces
 
-JSRT is not redistributed. Download and place paired images in directories such as:
+The experiments compare rib suppression approaches for chest radiographs (CXRs):
 
-- `Dataset/source`
-- `Dataset/target`
+- Convolutional Autoencoders (AE)
+- U-Net architectures
+- Generative Adversarial Networks (GAN)
 
-File names must match between source/target folders.
+The best-performing model is a Wasserstein GAN trained with a combined loss:
 
-## Installation
+- Wasserstein + L1 + Perceptual + Sobel
+
+## Step-by-step reproduction
+
+### 1) Obtain the dataset
+
+This work uses the publicly available JSRT dataset:
+
+**Japanese Society of Radiological Technology (JSRT) — Standard Digital Image Database**  
+http://db.jsrt.or.jp/eng.php
+
+**Note:** The JSRT dataset is not included in this repository due to licensing restrictions.
+
+### 2) Preprocess the data
+
+Apply the preprocessing and resizing described in the paper (Section 2).
+Images are resized to 1024×1024 or 512×512, depending on the model configuration.
+
+### 3) Set up the environment
+
+The original experiments used:
+
+- Python 3.6.8
+- TensorFlow 2.6.2
+- Segmentation Models v1.0.1
+- CUDA 11.4
+- NVIDIA Tesla V100 (32GB)
+
+Install Python dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Training
+GPU training requires CUDA and compatible NVIDIA drivers. Newer Python versions may require dependency adjustments.
 
-### Config-driven run
+### 4) Run the experiments
 
-```bash
-python train.py --config configs/base.yaml
-```
+Open and execute the provided Jupyter notebooks:
 
-### CLI override run
+- `GAN_BS.ipynb` — GAN experiments (Wasserstein + L1 + Perceptual + Sobel)
+- `AE_UNET_BS.ipynb` — AE and U-Net experiments (paper tables referenced inside the notebook)
 
-```bash
-python train.py \
-  --source-dir Dataset/source \
-  --target-dir Dataset/target \
-  --model unet \
-  --loss mixed_l2 \
-  --epochs 50 \
-  --batch-size 4 \
-  --lr 1e-3 \
-  --seed 42 \
-  --experiment-name unet_mixedl2
-```
+Each notebook includes preprocessing, model definitions, training, and evaluation.
 
-### Resume from checkpoint
+### 5) Evaluate results
 
-```bash
-python train.py --config configs/base.yaml --resume outputs/ae_mixed_l2/<run_id>/checkpoints/best.keras
-```
+Metrics reported:
 
-## Evaluation
+- PSNR
+- MS-SSIM
 
-```bash
-python evaluate.py \
-  --config configs/base.yaml \
-  --checkpoint outputs/ae_mixed_l2/<run_id>/checkpoints/best.keras \
-  --output-dir outputs/ae_mixed_l2/<run_id>/posthoc_eval
-```
+Metrics are computed as described in the paper (Section 2.5).
 
-## Reproducibility features
+## Trained models included
 
-- Global seed control (`random`, `numpy`, `tensorflow`).
-- Deterministic TensorFlow ops enabled where available.
-- Run-resolved config exported as YAML and JSON.
-- Metrics and artifacts saved to a versioned run directory:
+The `models/` directory contains trained weights for the best-performing configurations reported in the paper.
 
-```
-outputs/<experiment_name>/<timestamp>/
-  checkpoints/
-  metrics/
-  figures/
-  predictions/
-  reports/
-```
+Best GAN configuration:
 
-## Artifact outputs
+- Loss: Wasserstein + L1 + Perceptual + Sobel
+- Epochs: 750
+- Training size: 3980 samples
+- Resolution: 512×512×3
 
-Each training run saves:
+## Repository contents
 
-- Model checkpoints (`best.keras`, `last.keras`).
-- Keras epoch logs (`metrics/keras_history.csv`).
-- Training curves (`figures/training_curves.png`).
-- Predicted sample images (`predictions/*.png`).
-- Final evaluation report (`reports/evaluation_report.json`).
-- Methods-ready summary (`reports/reproducibility_methods_summary.md`).
+- `GAN_BS.ipynb` — GAN workflow
+- `AE_UNET_BS.ipynb` — AE/U-Net workflow
+- `models/` — trained weights
+- `configs/` — configuration files (if applicable)
+- `requirements.txt` — dependencies
+- `LICENSE` — MIT license
+- `CITATION.cff` — citation metadata
 
-## Methodology mapping to paper sections
+## Funding
 
-The generated `reproducibility_methods_summary.md` maps run settings to manuscript sections:
+Supported by:
 
-- **Data**: source/target directories and preprocessing resolution.
-- **Training setup**: model, loss, optimizer, learning rate, epochs, batch size, seed.
-- **Metrics**: final test metrics (loss, PSNR, MS-SSIM) for reporting tables.
+- Center for Artificial Intelligence and Quantum Computing in System Brain Research (CLARA), Grant No. 101136607-02
+- Research Platform for Digital Transformation and Society 5.0, Grant No. CZ.02.01.01/00/23 021/0012599
 
-## Legacy notebooks
+## Citation
 
-Original notebooks are retained at root and copied into `experiments/` for archival reproducibility:
+If you use this repository (code or weights), please cite the associated publication.
 
-- `AE_UNET_BS.ipynb`
-- `GAN_BS.ipynb`
+## License
 
-These notebooks are no longer the primary execution path.
+MIT License — see `LICENSE`.
+
+## Disclaimer
+
+For research use only. Bone-suppressed radiographs must not be used for clinical decision-making without appropriate regulatory validation and clinical assessment.
