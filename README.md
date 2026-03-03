@@ -32,7 +32,7 @@ http://db.jsrt.or.jp/eng.php
 
 ### 2) Preprocess the data
 
-Apply the preprocessing and resizing described in the paper (Section 2).
+Apply the preprocessing and resizing described in the paper (Section 2).  
 Images are resized to 1024×1024 or 512×512, depending on the model configuration.
 
 ### 3) Set up the environment
@@ -53,7 +53,7 @@ pip install -r requirements.txt
 
 GPU training requires CUDA and compatible NVIDIA drivers. Newer Python versions may require dependency adjustments.
 
-### 4) Run the experiments
+### 4) Run the experiments (notebook workflow)
 
 Open and execute the provided Jupyter notebooks:
 
@@ -71,6 +71,62 @@ Metrics reported:
 
 Metrics are computed as described in the paper (Section 2.5).
 
+## Project structure (merged CLI-first package)
+
+- `train.py` — main training entrypoint.
+- `evaluate.py` — standalone evaluation/report entrypoint.
+- `configs/base.yaml` — default experiment configuration.
+- `scripts/generate_methods_summary.py` — report/summary helper script.
+- `experiments/` — archival copy of original notebooks.
+- Root notebooks are preserved for backward compatibility.
+
+## CLI training and evaluation
+
+### Dataset layout for CLI runs
+
+Use paired directories such as:
+
+- `Dataset/source`
+- `Dataset/target`
+
+File names must match between source and target folders.
+
+### Train with config
+
+```bash
+python train.py --config configs/base.yaml
+```
+
+### Train with CLI args (override config values)
+
+```bash
+python train.py \
+  --source-dir Dataset/source \
+  --target-dir Dataset/target \
+  --model unet \
+  --loss mixed_l2 \
+  --epochs 50 \
+  --batch-size 4 \
+  --lr 1e-3 \
+  --seed 42 \
+  --experiment-name unet_mixedl2
+```
+
+### Resume training
+
+```bash
+python train.py --config configs/base.yaml --resume outputs/ae_mixed_l2/<run_id>/checkpoints/best.keras
+```
+
+### Run evaluation
+
+```bash
+python evaluate.py \
+  --config configs/base.yaml \
+  --checkpoint outputs/ae_mixed_l2/<run_id>/checkpoints/best.keras \
+  --output-dir outputs/ae_mixed_l2/<run_id>/posthoc_eval
+```
+
 ## Trained models included
 
 The `models/` directory contains trained weights for the best-performing configurations reported in the paper.
@@ -86,8 +142,11 @@ Best GAN configuration:
 
 - `GAN_BS.ipynb` — GAN workflow
 - `AE_UNET_BS.ipynb` — AE/U-Net workflow
+- `train.py` — CLI training entrypoint
+- `evaluate.py` — CLI evaluation entrypoint
+- `configs/` — configuration files
+- `scripts/` — utility scripts
 - `models/` — trained weights
-- `configs/` — configuration files (if applicable)
 - `requirements.txt` — dependencies
 - `LICENSE` — MIT license
 - `CITATION.cff` — citation metadata
