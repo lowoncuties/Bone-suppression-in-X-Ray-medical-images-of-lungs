@@ -261,7 +261,18 @@ This work was supported by:
 ## 9. Citation
 
 If you use this code or trained models, please cite the associated publication.
-
+```
+@ARTICLE{10.3389/frai.2026.1761336,
+  AUTHOR={Jochymek, Lukáš  and Vašinková, Markéta  and Doleží, Vít  and Gajdoš, Petr }
+  TITLE={GAN-based bone suppression using a combined loss function},
+  JOURNAL={Frontiers in Artificial Intelligence},
+  VOLUME={Volume 9 - 2026},
+  YEAR={2026},
+  URL={https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2026.1761336},
+  DOI={10.3389/frai.2026.1761336},
+  ISSN={2624-8212},
+}
+```
 ---
 
 ## 10. License
